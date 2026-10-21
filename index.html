@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bureau of Imaginary Meteorology — Forecasts for worlds that do not exist</title>
+<meta name="description" content="The Bureau of Imaginary Meteorology catalogues the weather of five non-existent planets. Every reading is exact. None of them can be checked.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET / TOKENS ============ */
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ink:#060911;
+  --ink-2:#0a0f18;
+  --paper:#f5f0e6;
+  --muted:rgba(245,240,230,.58);
+  --faint:rgba(245,240,230,.34);
+  --line:rgba(245,240,230,.13);
+  --line-2:rgba(245,240,230,.28);
+  --amber:#e9a34d;
+  --amber-dim:rgba(233,163,77,.16);
+  --cyan:#84d8e2;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --max:1280px;
+  --pad:clamp(20px,4vw,32px);
+}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ink);color:var(--paper);
+  font-family:var(--sans);font-weight:400;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1400px 900px at 78% 8%, #0e1626 0%, rgba(6,9,17,0) 62%),
+    radial-gradient(900px 700px at 8% 92%, #0b111c 0%, rgba(6,9,17,0) 60%);
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+::selection{background:var(--amber);color:#0a0703}
+
+/* ============ LAYERS ============ */
+#sky{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:0;display:block;pointer-events:none;
+}
+.grain{
+  position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.055;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.site-head,main,footer{position:relative;z-index:2}
+
+/* ============ FALLBACK ORB ============ */
+.fallback-orb{
+  display:none;position:fixed;z-index:0;
+  width:min(58vw,460px);aspect-ratio:1;border-radius:50%;
+  right:6vw;top:50%;transform:translateY(-50%);
+  background:radial-gradient(circle at 34% 28%, #ffe9c4 0%, #c9a06a 32%, #6b4526 64%, #0a0d15 100%);
+  box-shadow:0 0 140px rgba(233,163,77,.16), inset -34px -22px 90px rgba(0,0,0,.85);
+  animation:orbDrift 46s linear infinite;
+}
+@keyframes orbDrift{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(360deg)}}
+html.no-webgl .fallback-orb{display:block}
+html.no-webgl #sky{display:none}
+
+/* ============ HEADER ============ */
+.site-head{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  border-bottom:1px solid var(--line);
+  background:rgba(6,9,17,.58);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  backdrop-filter:blur(16px) saturate(1.2);
+}
+.nav{
+  max-width:var(--max);margin:0 auto;padding:0 var(--pad);
+  height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:11px;color:var(--paper)}
+.glyph{flex:none;color:var(--paper);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.brand:hover .glyph{transform:rotate(180deg)}
+.brand-txt{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  white-space:nowrap;line-height:1;
+}
+.brand-txt .bs{display:none}
+.links{display:flex;gap:clamp(14px,2.4vw,30px)}
+.links a{
+  position:relative;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);padding:6px 0;transition:color .25s;
+}
+.links a::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--amber);transform:scaleX(0);transform-origin:left;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1);
+}
+.links a:hover{color:var(--paper)}
+.links a:hover::after{transform:scaleX(1)}
+.clock{
+  display:flex;align-items:center;gap:8px;flex:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  color:var(--muted);font-variant-numeric:tabular-nums;
+}
+.pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--amber);flex:none;
+  box-shadow:0 0 0 0 rgba(233,163,77,.6);
+  animation:pulse 2.4s ease-out infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(233,163,77,.55)}
+  70%{box-shadow:0 0 0 9px rgba(233,163,77,0)}
+  100%{box-shadow:0 0 0 0 rgba(233,163,77,0)}
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  max-width:var(--max);margin:0 auto;
+  padding:110px var(--pad) 90px;
+  min-height:100vh;min-height:100svh;
+  display:flex;align-items:center;
+  touch-action:pan-y;
+}
+.hero-inner{max-width:640px;position:relative;z-index:2}
+.eyebrow{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);margin:0 0 30px;
+}
+.eyebrow .rule{width:38px;height:1px;background:var(--amber);opacity:.55;flex:none}
+h1{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.9rem,7.2vw,5.9rem);
+  line-height:.94;letter-spacing:-.022em;
+  margin:0 0 30px;text-wrap:balance;
+}
+h1 em{
+  font-style:italic;color:var(--amber);
+  text-shadow:0 0 60px rgba(233,163,77,.25);
+}
+.lede{
+  font-size:clamp(.98rem,1.35vw,1.12rem);
+  color:var(--muted);max-width:44ch;margin:0 0 38px;line-height:1.7;
+}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 24px;border-radius:2px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  border:1px solid transparent;cursor:pointer;
+  transition:all .3s cubic-bezier(.2,.8,.2,1);
+}
+.btn-primary{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn-primary:hover{background:var(--amber);border-color:var(--amber);transform:translateY(-2px)}
+.btn-ghost{color:var(--paper);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--paper);background:rgba(245,240,230,.06);transform:translateY(-2px)}
+.btn .arw{transition:transform .3s}
+.btn:hover .arw{transform:translateX(3px)}
+
+.planet-plate{
+  position:absolute;top:110px;right:var(--pad);
+  text-align:right;z-index:2;
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+  pointer-events:none;
+}
+.pp-id{
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;
+  color:var(--amber);text-transform:uppercase;
+}
+.pp-name{
+  font-family:var(--serif);font-size:clamp(1.6rem,2.8vw,2.3rem);
+  line-height:1.1;letter-spacing:-.01em;
+}
+.pp-class{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);max-width:230px;
+}
+.drag-hint{
+  position:absolute;left:50%;bottom:34px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);z-index:2;pointer-events:none;
+  animation:fadeHint 4s ease-in-out infinite;
+}
+@keyframes fadeHint{0%,100%{opacity:.45}50%{opacity:.95}}
+.drag-hint svg{width:14px;height:20px;flex:none}
+
+/* ============ SECTIONS ============ */
+section{position:relative}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+.section-head{margin-bottom:clamp(32px,5vw,56px)}
+.tag{
+  display:block;font-family:var(--mono);font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:16px;
+}
+.section-head h2{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2rem,4.4vw,3.4rem);
+  line-height:1.02;letter-spacing:-.02em;margin:0;max-width:22ch;
+}
+
+/* ---- Forecast ---- */
+.forecast{
+  padding:clamp(70px,10vw,120px) 0;
+  background:linear-gradient(180deg,
+    rgba(6,9,17,0) 0%,
+    rgba(6,9,17,.93) 13%,
+    rgba(6,9,17,.975) 60%,
+    rgba(6,9,17,1) 100%);
+}
+.worlds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.chip{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 16px;border-radius:999px;
+  border:1px solid var(--line);background:transparent;
+  color:var(--muted);cursor:pointer;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  transition:all .28s cubic-bezier(.2,.8,.2,1);
+  white-space:nowrap;
+}
+.chip .dot{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--c);box-shadow:0 0 10px var(--c);
+  transition:transform .28s;
+}
+.chip:hover{color:var(--paper);border-color:var(--line-2);background:rgba(245,240,230,.04)}
+.chip:hover .dot{transform:scale(1.35)}
+.chip[aria-pressed="true"]{
+  color:var(--paper);border-color:rgba(233,163,77,.6);
+  background:var(--amber-dim);
+  box-shadow:0 0 24px -8px rgba(233,163,77,.7);
+}
+
+.panel{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:linear-gradient(158deg, rgba(245,240,230,.05), rgba(245,240,230,.012) 60%);
+  padding:clamp(24px,3.6vw,46px);
+  display:grid;grid-template-columns:1.4fr .85fr;
+  gap:clamp(28px,4vw,56px);
+  overflow:hidden;
+}
+.panel::before{
+  content:'';position:absolute;top:0;left:0;width:52px;height:52px;
+  border-top:1px solid var(--amber);border-left:1px solid var(--amber);
+  opacity:.5;pointer-events:none;
+}
+.panel::after{
+  content:'';position:absolute;bottom:0;right:0;width:52px;height:52px;
+  border-bottom:1px solid var(--amber);border-right:1px solid var(--amber);
+  opacity:.5;pointer-events:none;
+}
+.panel-main,.panel-side{transition:opacity .26s ease, transform .26s ease}
+.panel.swapping .panel-main,
+.panel.swapping .panel-side{opacity:0;transform:translateY(7px)}
+
+.panel-top{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.pid{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  color:var(--amber);border:1px solid rgba(233,163,77,.35);
+  padding:4px 9px;border-radius:2px;
+}
+.pcls{
+  font-family:var(--mono);font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--faint);
+}
+.report{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.18rem,1.9vw,1.5rem);
+  line-height:1.55;letter-spacing:-.005em;
+  margin:0 0 26px;color:rgba(245,240,230,.94);text-wrap:pretty;
+}
+.advisory{
+  display:flex;gap:11px;align-items:flex-start;
+  font-family:var(--mono);font-size:10.5px;line-height:1.7;letter-spacing:.06em;
+  color:var(--amber);margin:0;padding-top:20px;border-top:1px solid var(--line);
+  text-transform:uppercase;
+}
+.advisory::before{content:'▲';font-size:9px;line-height:1.9;opacity:.8;flex:none}
+
+.panel-side{display:flex;flex-direction:column;gap:22px}
+.valid{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);padding-bottom:14px;border-bottom:1px solid var(--line);
+}
+.data{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px;margin:0}
+.data > div{min-width:0}
+.data dt{
+  font-family:var(--mono);font-size:9px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:5px;
+}
+.data dd{margin:0;font-size:14.5px;font-weight:400;letter-spacing:-.005em;color:var(--paper)}
+.spark{border-top:1px solid var(--line);padding-top:16px}
+.spark-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--faint);margin-bottom:10px;
+}
+.spark-head span:last-child{color:var(--amber)}
+.spark svg{width:100%;height:58px;display:block;overflow:visible}
+.spark .line{fill:none;stroke:var(--amber);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.spark .area{stroke:none;opacity:.55}
+
+.bulletin-btn{
+  display:inline-flex;align-items:center;gap:9px;align-self:flex-start;
+  background:transparent;border:1px solid var(--line-2);border-radius:2px;
+  padding:11px 16px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);transition:all .28s;
+}
+.bulletin-btn:hover{color:var(--paper);border-color:var(--amber);background:var(--amber-dim)}
+.bulletin-btn svg{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.bulletin-btn:hover svg{transform:rotate(180deg)}
+
+/* ---- Archive ---- */
+.archive{padding:clamp(70px,10vw,120px) 0;background:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.card{
+  background:var(--ink);padding:clamp(24px,3vw,36px);
+  display:flex;flex-direction:column;gap:14px;
+  transition:background .35s;
+  position:relative;
+}
+.card:hover{background:#0b111b}
+.card .meta{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);display:flex;justify-content:space-between;gap:10px;
+}
+.card .meta .no{color:var(--amber)}
+.card h3{
+  font-family:var(--serif);font-weight:400;font-size:clamp(1.3rem,1.9vw,1.6rem);
+  line-height:1.15;letter-spacing:-.01em;margin:0;
+}
+.card p{font-size:.87rem;line-height:1.7;color:var(--muted);margin:0;flex:1}
+.card .more{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--amber);display:inline-flex;align-items:center;gap:7px;
+  opacity:.75;transition:opacity .3s, gap .3s;
+}
+.card:hover .more{opacity:1;gap:12px}
+
+/* ---- Observatory ---- */
+.observatory{
+  padding:clamp(70px,10vw,130px) 0 clamp(60px,8vw,100px);
+  background:linear-gradient(180deg,#060911 0%,#080d16 100%);
+  border-top:1px solid var(--line);
+}
+.obs{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(30px,6vw,80px);align-items:start}
+.obs h2{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2rem,4vw,3.2rem);line-height:1.02;letter-spacing:-.02em;margin:0;
+}
+.obs h2 em{font-style:italic;color:var(--amber)}
+.obs-body p{font-size:1rem;line-height:1.78;color:var(--muted);margin:0 0 20px;max-width:56ch}
+.obs-body p:first-child{color:rgba(245,240,230,.86)}
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);
+  margin-top:36px;
+}
+.stat{background:var(--ink-2);padding:20px 16px}
+.stat b{
+  display:block;font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1;letter-spacing:-.02em;
+  color:var(--paper);margin-bottom:8px;
+}
+.stat span{
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint);line-height:1.5;display:block;
+}
+
+/* ---- Footer ---- */
+footer{border-top:1px solid var(--line);background:#04070d;padding:clamp(40px,6vw,64px) 0 28px}
+.foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:44px}
+.foot-brand .foot-glyph{
+  font-family:var(--serif);font-size:clamp(1.4rem,2.6vw,2rem);line-height:1.1;
+  letter-spacing:-.01em;margin-bottom:12px;
+}
+.foot-note{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--faint);margin:0;line-height:1.9;
+}
+.foot-links{display:flex;gap:clamp(20px,4vw,48px);flex-wrap:wrap}
+.foot-col h4{
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 14px;font-weight:400;
+}
+.foot-col a{
+  display:block;font-size:.85rem;color:var(--muted);margin-bottom:9px;
+  transition:color .25s;width:fit-content;
+}
+.foot-col a:hover{color:var(--amber)}
+.foot-fine{
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  padding-top:24px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(245,240,230,.24);
+}
+
+/* ---- Reveal ---- */
+.js .reveal{opacity:0;transform:translateY(20px);
+  transition:opacity .95s cubic-bezier(.2,.75,.2,1), transform .95s cubic-bezier(.2,.75,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+.js .reveal.d1{transition-delay:.08s}
+.js .reveal.d2{transition-delay:.16s}
+.js .reveal.d3{transition-delay:.24s}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1000px){
+  .panel{grid-template-columns:1fr;gap:34px}
+  .obs{grid-template-columns:1fr;gap:32px}
+  .planet-plate{display:none}
+}
+@media (max-width:900px){
+  .hero{
+    align-items:flex-end;
+    padding-bottom:14vh;
+    background:linear-gradient(to top,
+      rgba(6,9,17,.97) 0%,
+      rgba(6,9,17,.86) 34%,
+      rgba(6,9,17,.25) 62%,
+      rgba(6,9,17,0) 82%);
+  }
+  .hero-inner{max-width:100%}
+  .drag-hint{display:none}
+  .cards{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+}
+@media (max-width:720px){
+  .nav{height:58px;gap:12px}
+  .brand-txt .bl{display:none}
+  .brand-txt .bs{display:inline}
+  .links{gap:14px}
+  .links a{font-size:9.5px;letter-spacing:.1em}
+  .clock{display:none}
+  .hero{padding-top:96px}
+  .eyebrow{font-size:9px;letter-spacing:.16em;margin-bottom:22px}
+  .hero-cta .btn{padding:12px 18px;font-size:10px}
+  .foot-fine{flex-direction:column;gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .js .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body id="top">
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="fallback-orb" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-head">
+  <div class="nav">
+    <a class="brand" href="#top" aria-label="Bureau of Imaginary Meteorology — home">
+      <svg class="glyph" viewBox="0 0 24 24" width="23" height="23" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.8" fill="currentColor" opacity="0.92"/>
+        <ellipse cx="12" cy="12" rx="10.6" ry="3.5" stroke="currentColor" stroke-width="0.9" opacity="0.45" transform="rotate(-19 12 12)"/>
+        <circle cx="20.6" cy="8.4" r="1.25" fill="#e9a34d"/>
+      </svg>
+      <span class="brand-txt">
+        <span class="bl">Bureau of Imaginary Meteorology</span>
+        <span class="bs">B.I.M. — Est. 1961</span>
+      </span>
+    </a>
+    <nav class="links" aria-label="Sections">
+      <a href="#forecasts">Forecasts</a>
+      <a href="#archive">Archive</a>
+      <a href="#observatory">Observatory</a>
+    </nav>
+    <div class="clock"><span class="pulse" aria-hidden="true"></span><span id="clock">--:--:--</span>&nbsp;UTC</div>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow"><span class="rule"></span>Bulletin No. 4,412 · issued daily since 1961</p>
+      <h1>Forecasts for worlds that <em>do not exist.</em></h1>
+      <p class="lede">The Bureau of Imaginary Meteorology catalogues the weather of five non-existent planets. Every reading is exact. None of them can be checked.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#forecasts">Read today's forecast <span class="arw">→</span></a>
+        <a class="btn btn-ghost" href="#observatory">About the Bureau</a>
+      </div>
+    </div>
+
+    <div class="planet-plate" aria-hidden="true">
+      <span class="pp-id" id="plateId">BIM-001</span>
+      <span class="pp-name" id="plateName">Vessel-9</span>
+      <span class="pp-class" id="plateClass">Silicate world / glass desert</span>
+    </div>
+
+    <div class="drag-hint" aria-hidden="true">
+      <svg viewBox="0 0 14 20" fill="none" stroke="currentColor" stroke-width="1.1">
+        <rect x="0.6" y="0.6" width="12.8" height="18.8" rx="6.4"/>
+        <line x1="7" y1="4.6" x2="7" y2="8"/>
+      </svg>
+      <span>Drag to rotate</span>
+    </div>
+  </section>
+
+  <!-- ================= FORECASTS ================= -->
+  <section class="forecast" id="forecasts">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="tag">01 — Current conditions</span>
+        <h2>Select a world.</h2>
+      </div>
+
+      <div class="worlds reveal d1" id="worlds" role="group" aria-label="Select a world"></div>
+
+      <div class="panel reveal d2" id="panel">
+        <div class="panel-main">
+          <div class="panel-top">
+            <span class="pid" id="fId">BIM-001</span>
+            <span class="pcls" id="fClass">Silicate world / glass desert</span>
+          </div>
+          <p class="report" id="fReport" aria-live="polite"></p>
+          <p class="advisory" id="fAdv"></p>
+        </div>
+        <div class="panel-side">
+          <div class="valid">Forecast valid — indefinite</div>
+          <dl class="data" id="fData"></dl>
+          <div class="spark">
+            <div class="spark-head"><span>Pressure trend · 24h</span><span id="fTrend">rising</span></div>
+            <svg viewBox="0 0 320 58" preserveAspectRatio="none" id="fSpark" aria-hidden="true">
+              <defs>
+                <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#e9a34d" stop-opacity="0.42"/>
+                  <stop offset="100%" stop-color="#e9a34d" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path class="area" id="sparkArea" fill="url(#sparkGrad)"></path>
+              <path class="line" id="sparkLine"></path>
+            </svg>
+          </div>
+          <button class="bulletin-btn" id="randomBtn" type="button">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M1 3.2h2.6l4.8 5.6H11M1 8.8h2.6l1.6-1.9M8.4 3.2H11M9.6 1.8 11 3.2 9.6 4.6M9.6 7.4 11 8.8 9.6 10.2"/>
+            </svg>
+            Issue another bulletin
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ARCHIVE ================= -->
+  <section class="archive" id="archive">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="tag">02 — Archive</span>
+        <h2>Selected bulletins.</h2>
+      </div>
+      <div class="cards">
+        <article class="card reveal d1">
+          <div class="meta"><span class="no">No. 4,401</span><span>14 March</span></div>
+          <h3>On the upward rain</h3>
+          <p>Four hundred years of precipitation that falls upward. Notes from the northern shelf, where the sky smells of ozone and nothing can be proven.</p>
+          <span class="more">Read the bulletin <span aria-hidden="true">→</span></span>
+        </article>
+        <article class="card reveal d2">
+          <div class="meta"><span class="no">No. 4,388</span><span>02 March</span></div>
+          <h3>The singing dunes of Vessel-9</h3>
+          <p>Eleven recordings, one explanation, and a survey team that has requested reassignment three times since the second bell.</p>
+          <span class="more">Read the bulletin <span aria-hidden="true">→</span></span>
+        </article>
+        <article class="card reveal d3">
+          <div class="meta"><span class="no">No. 4,406</span><span>09 March</span></div>
+          <h3>Halcyon: fifty-one years of silence</h3>
+          <p>Sonar has returned nothing since 1974. The Bureau has officially stopped describing the result as a malfunction.</p>
+          <span class="more">Read the bulletin <span aria-hidden="true">→</span></span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OBSERVATORY ================= -->
+  <section class="observatory" id="observatory">
+    <div class="wrap obs">
+      <div class="reveal">
+        <span class="tag">03 — The Observatory</span>
+        <h2>A bureau with <em>no territory.</em></h2>
+      </div>
+      <div class="obs-body reveal d1">
+        <p>The Bureau of Imaginary Meteorology was founded in 1961 by a cartographer named Ilse Vandermeer, who mistook a cloud for a continent and spent the following four years forecasting its weather. She was never corrected.</p>
+        <p>The Bureau has operated continuously since, issuing a bulletin every morning at 06:00 UTC to a subscriber list that has never been disclosed. We do not observe. We do not predict. We describe — with as much precision as the subject allows — weather that is happening somewhere it cannot happen.</p>
+        <p>All measurements are exact. None can be checked.</p>
+        <div class="stats">
+          <div class="stat"><b>05</b><span>Worlds under observation</span></div>
+          <div class="stat"><b>4,412</b><span>Bulletins issued</span></div>
+          <div class="stat"><b>00</b><span>Verified visits</span></div>
+          <div class="stat"><b>63</b><span>Years continuous operation</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-brand">
+        <div class="foot-glyph">Bureau of Imaginary<br>Meteorology</div>
+        <p class="foot-note">
+          Est. 1961 · Transmitting daily at 06:00 UTC<br>
+          Lat 00.000 / Lon 00.000 · Station null
+        </p>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col">
+          <h4>Worlds</h4>
+          <a href="#forecasts">Vessel-9</a>
+          <a href="#forecasts">Orrery</a>
+          <a href="#forecasts">Halcyon</a>
+          <a href="#forecasts">Cinder</a>
+          <a href="#forecasts">Null Point</a>
+        </div>
+        <div class="foot-col">
+          <h4>Bureau</h4>
+          <a href="#archive">Archive</a>
+          <a href="#observatory">Observatory</a>
+          <a href="#forecasts">Current bulletin</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-fine">
+      <span>A work of fiction. The weather is not.</span>
+      <span>No world described here exists. All readings are nonetheless accurate.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  'use strict';
+  document.documentElement.classList.add('js');
+
+  /* ============================================================
+     DATA
+  ============================================================ */
+  var WORLDS = [
+    {
+      id:'BIM-001', name:'Vessel-9', cls:'Silicate world / glass desert',
+      dot:'#e0b878',
+      colors:['#4a2f1c','#c9a06a','#ffe9c4'],
+      scale:2.5, type:0, seed:11.0, ring:0,
+      data:[
+        ['Mean temp','61 °C'],
+        ['Wind','340 km/h · E'],
+        ['Precipitation','Powdered glass'],
+        ['Visibility','0.4 km'],
+        ['Pressure','0.71 atm'],
+        ['Humidity','0 %']
+      ],
+      report:'A front of powdered glass is crossing the Cinderpan at 340 kilometres per hour. Visibility will fall below half a kilometre by local noon. Travellers are advised to leave the basin before the second bell. The dunes are expected to sing again tonight — a low mineral hum the survey team has recorded eleven times and explained once.',
+      advisory:'Advisory — Do not remove your visor to hear the dunes.',
+      spark:[4,5,5,6,8,11,14,13,10,8,6,5,4,4,5,7,9,12,15,13,10,7,5,4]
+    },
+    {
+      id:'BIM-002', name:'Orrery', cls:'Gas giant / banded',
+      dot:'#a892e0',
+      colors:['#241a44','#7b5ea7','#9fe6d6'],
+      scale:2.0, type:1, seed:3.7, ring:1,
+      data:[
+        ['Mean temp','−148 °C'],
+        ['Wind','1,120 km/h · N'],
+        ['Precipitation','Upward rain'],
+        ['Visibility','Unlimited'],
+        ['Pressure','44 bar'],
+        ['Humidity','Trace']
+      ],
+      report:'The Great Upward Rain enters its four-hundredth year. Precipitation rises from the cloud deck in braided columns, climbs eleven kilometres, and returns as light. Pressure at the equatorial belt holds at 44 bar. Observers on the northern shelf report a violet sky and a faint smell of ozone — which is not possible, and is reported anyway.',
+      advisory:'Advisory — Upward rain is not drinkable. It is not anything.',
+      spark:[9,8,9,11,13,12,10,9,8,9,11,14,16,15,13,11,9,8,9,12,14,13,11,10]
+    },
+    {
+      id:'BIM-003', name:'Halcyon', cls:'Ocean world / pelagic',
+      dot:'#6fd0d8',
+      colors:['#062a3a','#1f7a8c','#a8ece4'],
+      scale:3.2, type:0, seed:27.4, ring:0,
+      data:[
+        ['Mean temp','19 °C'],
+        ['Wind','12 km/h · SW'],
+        ['Precipitation','Continuous'],
+        ['Visibility','0 m below 200'],
+        ['Pressure','1.02 atm'],
+        ['Humidity','100 %']
+      ],
+      report:'The Tide of No Return peaks at 03:40 local. The surface will rise four metres and remain there. Do not swim against it: the water is not travelling anywhere in particular, but it is very committed. Below two hundred metres the ocean is exactly body temperature and entirely silent. Sonar has returned nothing since 1974.',
+      advisory:'Advisory — The tide will not take you anywhere. It will still take you.',
+      spark:[6,7,9,12,16,18,17,15,12,10,8,7,6,6,7,9,13,17,19,18,15,11,8,7]
+    },
+    {
+      id:'BIM-004', name:'Cinder', cls:'Volcanic world / ash plain',
+      dot:'#f08a4b',
+      colors:['#170f0e','#432b22','#ff8a45'],
+      scale:2.8, type:0, seed:44.2, ring:0,
+      data:[
+        ['Mean temp','412 °C'],
+        ['Wind','60 km/h · variable'],
+        ['Precipitation','Warm ash'],
+        ['Visibility','2.1 km'],
+        ['Pressure','1.9 atm'],
+        ['Humidity','0 %']
+      ],
+      report:'The northern vent is expected to exhale at dusk. Ash fall will be light, warm and faintly magnetic. Citizens are reminded that the rain here is not rain. The sky will be the colour of a struck match for approximately nine minutes, after which the ground will be two centimetres higher than before — as it is every evening.',
+      advisory:'Advisory — The rain here is not rain. Shelter is a formality.',
+      spark:[11,13,16,20,18,14,11,9,8,9,11,14,17,21,19,15,12,10,9,10,12,15,17,14]
+    },
+    {
+      id:'BIM-005', name:'Null Point', cls:'Ice world / high albedo',
+      dot:'#a9c6e8',
+      colors:['#1c2637','#7f9dbf','#eaf6ff'],
+      scale:3.8, type:2, seed:61.8, ring:0,
+      data:[
+        ['Mean temp','−186 °C'],
+        ['Wind','0 km/h'],
+        ['Precipitation','None'],
+        ['Visibility','40 km'],
+        ['Pressure','0.04 atm'],
+        ['Humidity','—']
+      ],
+      report:'Clear skies. Wind: none. Precipitation: none. Sound: none. The station reports a reading of absolute quiet — the third on record. Visibility is forty kilometres in every direction and there is nothing to see. Duty officers are rotated every thirty days. The Bureau does not know why the ice is blue, and has stopped asking.',
+      advisory:'Advisory — Conversation is permitted. It will not be heard.',
+      spark:[5,5,5,5,4,5,5,5,6,5,5,4,5,5,5,5,6,5,4,5,5,5,5,5]
+    }
+  ];
+
+  /* ============================================================
+     DOM — CLOCK
+  ============================================================ */
+  var clockEl = document.getElementById('clock');
+  function tickClock(){
+    var d = new Date();
+    var p = function(n){ return (n<10?'0':'')+n; };
+    clockEl.textContent = p(d.getUTCHours())+':'+p(d.getUTCMinutes())+':'+p(d.getUTCSeconds());
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  /* ============================================================
+     DOM — WORLD CHIPS
+  ============================================================ */
+  var worldsEl = document.getElementById('worlds');
+  var chips = [];
+  WORLDS.forEach(function(w, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.style.setProperty('--c', w.dot);
+    b.innerHTML = '<span class="dot" aria-hidden="true"></span>' + w.name;
+    b.addEventListener('click', function(){ selectPlanet(i); });
+    worldsEl.appendChild(b);
+    chips.push(b);
+  });
+
+  /* ============================================================
+     DOM — PANEL RENDERING
+  ============================================================ */
+  var panel     = document.getElementById('panel');
+  var fId       = document.getElementById('fId');
+  var fClass    = document.getElementById('fClass');
+  var fReport   = document.getElementById('fReport');
+  var fAdv      = document.getElementById('fAdv');
+  var fData     = document.getElementById('fData');
+  var fTrend    = document.getElementById('fTrend');
+  var sparkLine = document.getElementById('sparkLine');
+  var sparkArea = document.getElementById('sparkArea');
+  var plateId   = document.getElementById('plateId');
+  var plateName = document.getElementById('plateName');
+  var plateCls  = document.getElementById('plateClass');
+
+  function buildSpark(vals){
+    var W = 320, H = 58, pad = 4;
+    var max = Math.max.apply(null, vals);
+    var min = Math.min.apply(null, vals);
+    var range = (max - min) || 1;
+    var pts = vals.map(function(v, i){
+      var x = (i / (vals.length - 1)) * W;
+      var y = H - pad - ((v - min) / range) * (H - pad * 2);
+      return [x, y];
+    });
+    var line = pts.map(function(p, i){
+      return (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1);
+    }).join(' ');
+    var area = line + ' L' + W + ',' + H + ' L0,' + H + ' Z';
+    sparkLine.setAttribute('d', line);
+    sparkArea.setAttribute('d', area);
+    var delta = vals[vals.length - 1] - vals[0];
+    fTrend.textContent = delta > 2 ? 'rising' : (delta < -2 ? 'falling' : 'steady');
+  }
+
+  function paint(i){
+    var w = WORLDS[i];
+    fId.textContent     = w.id;
+    fClass.textContent  = w.cls;
+    fReport.textContent = w.report;
+    fAdv.textContent    = w.advisory;
+    plateId.textContent = w.id;
+    plateName.textContent = w.name;
+    plateCls.textContent  = w.cls;
+
+    fData.innerHTML = '';
+    w.data.forEach(function(row){
+      var div = document.createElement('div');
+      var dt = document.createElement('dt');
+      var dd = document.createElement('dd');
+      dt.textContent = row[0];
+      dd.textContent = row[1];
+      div.appendChild(dt);
+      div.appendChild(dd);
+      fData.appendChild(div);
+    });
+
+    buildSpark(w.spark);
+  }
+
+  /* ============================================================
+     SELECTION
+  ============================================================ */
+  var current = 0;
+  var swapToken = 0;
+
+  function selectPlanet(i){
+    if(i === current) return;
+    current = i;
+
+    chips.forEach(function(c, j){
+      c.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+    });
+
+    // 3D target (if available)
+    if(window.BIM3D && window.BIM3D.setTarget) window.BIM3D.setTarget(i);
+
+    // Panel swap animation
+    var token = ++swapToken;
+    panel.classList.add('swapping');
+    setTimeout(function(){
+      if(token !== swapToken) return;
+      paint(i);
+      panel.classList.remove('swapping');
+    }, 230);
+  }
+
+  document.getElementById('randomBtn').addEventListener('click', function(){
+    var next = current;
+    while(next === current) next = Math.floor(Math.random() * WORLDS.length);
+    selectPlanet(next);
+  });
+
+  // initial paint (no animation)
+  paint(0);
+
+  /* ============================================================
+     REVEAL ON SCROLL
+  ============================================================ */
+  var reveals = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach(function(el){ io.observe(el); });
+  } else {
+    reveals.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ============================================================
+     THREE.JS — PLANET
+  ============================================================ */
+  (function init3D(){
+    if(!window.THREE){ document.documentElement.classList.add('no-webgl'); return; }
+
+    var canvas = document.getElementById('sky');
+    var renderer, scene, camera, world, planet, atmo, ring;
+    var uniforms, atmoU, ringU;
+    var clock = new THREE.Clock();
+
+    try{
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas, antialias: true, alpha: true,
+        powerPreference: 'high-performance'
+      });
+    }catch(err){
+      document.documentElement.classList.add('no-webgl');
+      return;
+    }
+    if(!renderer || !renderer.getContext()){
+      document.documentElement.classList.add('no-webgl');
+      return;
+    }
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    scene  = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 300);
+    camera.position.set(0, 0, 5.4);
+
+    world = new THREE.Group();
+    scene.add(world);
+
+    /* ---------- SHADERS ---------- */
+    var NOISE = [
+      'float hash(vec3 p){ return fract(sin(dot(p, vec3(127.1,311.7,74.7))) * 43758.5453123); }',
+      'float noise(vec3 x){',
+      '  vec3 i = floor(x), f = fract(x);',
+      '  f = f*f*(3.0-2.0*f);',
+      '  return mix(mix(mix(hash(i+vec3(0.0,0.0,0.0)),hash(i+vec3(1.0,0.0,0.0)),f.x),',
+      '                 mix(hash(i+vec3(0.0,1.0,0.0)),hash(i+vec3(1.0,1.0,0.0)),f.x),f.y),',
+      '             mix(mix(hash(i+vec3(0.0,0.0,1.0)),hash(i+vec3(1.0,0.0,1.0)),f.x),',
+      '                 mix(hash(i+vec3(0.0,1.0,1.0)),hash(i+vec3(1.0,1.0,1.0)),f.x),f.y),f.z);',
+      '}',
+      'float fbm(vec3 p){',
+      '  float v = 0.0; float a = 0.5;',
+      '  for(int i=0;i<5;i++){ v += a*noise(p); p *= 2.03; a *= 0.5; }',
+      '  return v;',
+      '}'
+    ].join('\n');
+
+    var vertPlanet = [
+      'varying vec3 vPos;',
+      'varying vec3 vWorldPos;',
+      'varying vec3 vNormalW;',
+      'void main(){',
+      '  vPos = position;',
+      '  vec4 wp = modelMatrix * vec4(position, 1.0);',
+      '  vWorldPos = wp.xyz;',
+      '  vNormalW = normalize(mat3(modelMatrix) * normal);',
+      '  gl_Position = projectionMatrix * viewMatrix * wp;',
+      '}'
+    ].join('\n');
+
+    var fragPlanet = [
+      'precision highp float;',
+      'uniform float uTime;',
+      'uniform float uSeed;',
+      'uniform float uNoiseScale;',
+      'uniform float uType;',
+      'uniform vec3 uColorA;',
+      'uniform vec3 uColorB;',
+      'uniform vec3 uColorC;',
+      'uniform vec3 uLightDir;',
+      'uniform vec3 uCamPos;',
+      'varying vec3 vPos;',
+      'varying vec3 vWorldPos;',
+      'varying vec3 vNormalW;',
+      NOISE,
+      'void main(){',
+      '  vec3 p = normalize(vPos);',
+      '  float h;',
+      '  if(uType < 0.5){',
+      '    float f = fbm(p * uNoiseScale + vec3(uSeed));',
+      '    h = smoothstep(0.28, 0.80, f);',
+      '  } else if(uType < 1.5){',
+      '    float bands = sin(p.y * 11.0 + fbm(p * 2.2 + uSeed) * 3.2);',
+      '    h = 0.5 + 0.5 * bands;',
+      '    h = mix(h, fbm(p * uNoiseScale + uSeed), 0.30);',
+      '  } else {',
+      '    float f = fbm(p * uNoiseScale * 1.35 + uSeed);',
+      '    h = smoothstep(0.40, 0.62, f) * 0.88;',
+      '  }',
+      '  vec3 col = mix(uColorA, uColorB, smoothstep(0.0, 0.62, h));',
+      '  col = mix(col, uColorC, smoothstep(0.62, 1.0, h));',
+      '  vec3 N = normalize(vNormalW);',
+      '  vec3 L = normalize(uLightDir);',
+      '  vec3 V = normalize(uCamPos - vWorldPos);',
+      '  float diff = smoothstep(-0.20, 0.62, dot(N, L));',
+      '  float fres = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);',
+      '  fres *= 0.86 + 0.14 * sin(uTime * 0.7 + vPos.y * 5.0);',
+      '  vec3 c = col * (0.055 + 0.945 * diff);',
+      '  c += uColorC * fres * 0.42;',
+      '  c += uColorB * 0.028;',
+      '  gl_FragColor = vec4(c, 1.0);',
+      '}'
+    ].join('\n');
+
+    var vertAtmo = [
+      'varying vec3 vWorldPos;',
+      'varying vec3 vNormalW;',
+      'void main(){',
+      '  vec4 wp = modelMatrix * vec4(position, 1.0);',
+      '  vWorldPos = wp.xyz;',
+      '  vNormalW = normalize(mat3(modelMatrix) * normal);',
+      '  gl_Position = projectionMatrix * viewMatrix * wp;',
+      '}'
+    ].join('\n');
+
+    var fragAtmo = [
+      'precision highp float;',
+      'uniform vec3 uColor;',
+      'uniform vec3 uCamPos;',
+      'uniform float uOpacity;',
+      'varying vec3 vWorldPos;',
+      'varying vec3 vNormalW;',
+      'void main(){',
+      '  vec3 N = normalize(vNormalW);',
+      '  vec3 V = normalize(uCamPos - vWorldPos);',
+      '  float f = pow(1.0 - abs(dot(N, V)), 3.0);',
+      '  gl_FragColor = vec4(uColor * f * uOpacity, 1.0);',
+      '}'
+    ].join('\n');
+
+    var vertRing = [
+      'varying vec3 vLocal;',
+      'void main(){',
+      '  vLocal = position;',
+      '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+      '}'
+    ].join('\n');
+
+    var fragRing = [
+      'precision highp float;',
+      'uniform vec3 uColor;',
+      'uniform float uOpacity;',
+      'varying vec3 vLocal;',
+      'void main(){',
+      '  float r = length(vLocal.xy);',
+      '  float t = smoothstep(1.72, 1.88, r) * (1.0 - smoothstep(2.30, 2.48, r));',
+      '  float bands = 0.55 + 0.45 * sin(r * 47.0) * sin(r * 16.0 + 1.3);',
+      '  float a = t * (0.55 + 0.45 * bands) * uOpacity * 0.85;',
+      '  gl_FragColor = vec4(uColor, a);',
+      '}'
+    ].join('\n');
+
+    /* ---------- PLANET ---------- */
+    var w0 = WORLDS[0];
+    uniforms = {
+      uTime:       { value: 0 },
+      uSeed:       { value: w0.seed },
+      uNoiseScale: { value: w0.scale },
+      uType:       { value: w0.type },
+      uColorA:     { value: new THREE.Color(w0.colors[0]) },
+      uColorB:     { value: new THREE.Color(w0.colors[1]) },
+      uColorC:     { value: new THREE.Color(w0.colors[2]) },
+      uLightDir:   { value: new THREE.Vector3(-0.62, 0.52, 0.78).normalize() },
+      uCamPos:     { value: new THREE.Vector3() }
+    };
+
+    planet = new THREE.Mesh(
+      new THREE.SphereGeometry(1.28, 128, 128),
+      new THREE.ShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: vertPlanet,
+        fragmentShader: fragPlanet
+      })
+    );
+    world.add(planet);
+
+    /* ---------- ATMOSPHERE ---------- */
+    atmoU = {
+      uColor:   { value: new THREE.Color(w0.colors[2]) },
+      uCamPos:  { value: new THREE.Vector3() },
+      uOpacity: { value: 0.85 }
+    };
+    atmo = new THREE.Mesh(
+      new THREE.SphereGeometry(1.28 * 1.10, 64, 64),
+      new THREE.ShaderMaterial({
+        uniforms: atmoU,
+        vertexShader: vertAtmo,
+        fragmentShader: fragAtmo,
+        side: THREE.BackSide,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    world.add(atmo);
+
+    /* ---------- RING ---------- */
+    ringU = {
+      uColor:   { value: new THREE.Color(w0.colors[2]) },
+      uOpacity: { value: 0 }
+    };
+    ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.75, 2.45, 160, 1),
+      new THREE.ShaderMaterial({
+        uniforms: ringU,
+        vertexShader: vertRing,
+        fragmentShader: fragRing,
+        side: THREE.DoubleSide,
+        transparent: true,
+        depthWrite: false
+      })
+    );
+    ring.rotation.x = -Math.PI / 2 + 0.30;
+    ring.rotation.z = 0.14;
+    world.add(ring);
+
+    /* ---------- STARS ---------- */
+    var starGroup = new THREE.Group();
+    (function makeStars(count, rMin, rMax, size, color, opacity){
+      var pos = new Float32Array(count * 3);
+      for(var i = 0; i < count; i++){
+        var r = rMin + Math.random() * (rMax - rMin);
+        var theta = Math.random() * Math.PI * 2;
+        var phi = Math.acos(2 * Math.random() - 1);
+        pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+        pos[i * 3 + 1] = r * Math.cos(phi);
+        pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+      }
+      var g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      var m = new THREE.PointsMaterial({
+        size: size, color: color, transparent: true, opacity: opacity,
+        sizeAttenuation: true, depthWrite: false
+      });
+      starGroup.add(new THREE.Points(g, m));
+    })(1500, 16, 46, 0.075, 0xcfdcf2, 0.85);
+
+    (function makeStars2(){
+      var count = 160, pos = new Float32Array(count * 3);
+      for(var i = 0; i < count; i++){
+        var r = 12 + Math.random() * 22;
+        var theta = Math.random() * Math.PI * 2;
+        var phi = Math.acos(2 * Math.random() - 1);
+        pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+        pos[i * 3 + 1] = r * Math.cos(phi);
+        pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+      }
+      var g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      var m = new THREE.PointsMaterial({
+        size: 0.13, color: 0xffe3bd, transparent: true, opacity: 0.7,
+        sizeAttenuation: true, depthWrite: false
+      });
+      starGroup.add(new THREE.Points(g, m));
+    })();
+
+    scene.add(starGroup);
+
+    /* ---------- TARGET STATE ---------- */
+    var T = {
+      a: new THREE.Color(w0.colors[0]),
+      b: new THREE.Color(w0.colors[1]),
+      c: new THREE.Color(w0.colors[2]),
+      scale: w0.scale, type: w0.type, seed: w0.seed, ring: w0.ring
+    };
+
+    window.BIM3D = {
+      setTarget: function(i){
+        var w = WORLDS[i];
+        T.a.set(w.colors[0]);
+        T.b.set(w.colors[1]);
+        T.c.set(w.colors[2]);
+        T.scale = w.scale;
+        T.type  = w.type;
+        T.seed  = w.seed;
+        T.ring  = w.ring;
+      }
+    };
+
+    /* ---------- RESIZE ---------- */
+    function resize(){
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      var aspect = w / h;
+      renderer.setSize(w, h, false);
+      camera.aspect = aspect;
+      camera.position.z = aspect < 1.0 ? 7.0 : (aspect < 1.35 ? 6.0 : 5.4);
+      camera.updateProjectionMatrix();
+
+      if(aspect < 1.0){
+        world.position.set(0, 0.95, 0);
+        world.scale.setScalar(0.92);
+      } else if(aspect < 1.45){
+        world.position.set(0.55, 0.15, 0);
+        world.scale.setScalar(1.0);
+      } else {
+        world.position.set(1.25, 0.05, 0);
+        world.scale.setScalar(1.0);
+      }
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    /* ---------- DRAG ---------- */
+    var rotX = 0.10, rotY = -0.35;
+    var velX = 0, velY = 0;
+    var dragging = false, lastX = 0, lastY = 0;
+    var hero = document.querySelector('.hero');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    window.addEventListener('pointerdown', function(e){
+      if(e.target.closest('a,button,input,select,textarea')) return;
+      if(!hero.contains(e.target)) return;
+      dragging = true;
+      lastX = e.clientX; lastY = e.clientY;
+      velX = 0; velY = 0;
+      document.body.style.userSelect = 'none';
+    }, { passive: true });
+
+    window.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      var dx = e.clientX - lastX;
+      var dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      rotY += dx * 0.006;
+      rotX += dy * 0.005;
+      rotX = Math.max(-0.95, Math.min(0.95, rotX));
+      velX = dx * 0.006;
+      velY = dy * 0.005;
+    }, { passive: true });
+
+    function endDrag(){
+      if(!dragging) return;
+      dragging = false;
+      document.body.style.userSelect = '';
+    }
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    window.addEventListener('blur', endDrag);
+
+    /* ---------- LOOP ---------- */
+    var running = true;
+    document.addEventListener('visibilitychange', function(){
+      running = !document.hidden;
+      if(running) clock.getDelta();
+    });
+
+    function frame(){
+      requestAnimationFrame(frame);
+      if(!running) return;
+
+      var dt = Math.min(clock.getDelta(), 0.05);
+      var t  = clock.getElapsedTime();
+
+      // inertia / idle drift
+      if(!dragging){
+        velX *= 0.93;
+        velY *= 0.93;
+        rotY += velX;
+        rotX += velY;
+        rotX += (0.10 - rotX) * 0.005;
+        if(!reduce) rotY += dt * 0.048;
+      }
+      world.rotation.y = rotY;
+      world.rotation.x = rotX;
+
+      // uniform easing
+      var k = 1 - Math.pow(0.0015, dt);
+      uniforms.uColorA.value.lerp(T.a, k);
+      uniforms.uColorB.value.lerp(T.b, k);
+      uniforms.uColorC.value.lerp(T.c, k);
+      uniforms.uNoiseScale.value += (T.scale - uniforms.uNoiseScale.value) * k;
+      uniforms.uType.value       += (T.type  - uniforms.uType.value) * k;
+      uniforms.uSeed.value       += (T.seed  - uniforms.uSeed.value) * k;
+      uniforms.uTime.value        = t;
+
+      atmoU.uColor.value.lerp(T.c, k);
+      ringU.uColor.value.lerp(T.c, k);
+      ringU.uOpacity.value += (T.ring - ringU.uOpacity.value) * k;
+
+      uniforms.uCamPos.value.copy(camera.position);
+      atmoU.uCamPos.value.copy(camera.position);
+
+      // stars drift
+      starGroup.rotation.y += dt * 0.008;
+      starGroup.rotation.x = Math.sin(t * 0.05) * 0.05;
+
+      renderer.render(scene, camera);
+    }
+    frame();
+  })();
+
+})();
+</script>
+</body>
+</html>
